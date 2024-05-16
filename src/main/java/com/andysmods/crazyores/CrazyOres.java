@@ -1,22 +1,23 @@
 package com.andysmods.crazyores;
 
-import net.fabricmc.api.ModInitializer;
+import com.andysmods.CrazyOresModInfo;
+import com.andysmods.api.IModInitializer;
 
+import com.andysmods.crazyores.registry.ItemRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CrazyOres implements ModInitializer {
-	// This logger is used to write text to the console and the log file.
-	// It is considered best practice to use your mod id as the logger's name.
-	// That way, it's clear which mod wrote info, warnings, and errors.
-    public static final Logger LOGGER = LoggerFactory.getLogger("crazyores");
+public class CrazyOres implements IModInitializer {
+
+	public static final CrazyOresModInfo MOD_INFO = new CrazyOresModInfo("crazyores");
+	public static final Logger CRAZYORES_LOGGER = LoggerFactory.getLogger(MOD_INFO.modId());
+
+	private static final ItemRegistry itemRegistry = new ItemRegistry();
 
 	@Override
 	public void onInitialize() {
-		// This code runs as soon as Minecraft is in a mod-load-ready state.
-		// However, some things (like resources) may still be uninitialized.
-		// Proceed with mild caution.
+		CRAZYORES_LOGGER.info("Hello, CrazyOres!");
 
-		LOGGER.info("Hello Fabric world!");
+		itemRegistry.onInitializeRegistry();
 	}
 }

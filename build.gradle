@@ -43,7 +43,7 @@ repositories { RepositoryHandler handler ->
 	mavenCentral()
 
 	// Applied Energistics 2
-	exclusiveRepo(handler, 'https://modmaven.dev/', 'appeng', 'mcjty.theoneprobe')
+	exclusiveRepo(handler, 'https://modmaven.dev/', 'appeng')
 
 	// Curios
 	exclusiveRepo(handler, 'https://maven.theillusivec4.top/', 'top.theillusivec4.curios')
@@ -52,16 +52,10 @@ repositories { RepositoryHandler handler ->
 	exclusiveRepo(handler, 'https://www.cursemaven.com', 'curse.maven')
 
 	// Jei
-	exclusiveRepo(handler, 'https://maven.blamejared.com', filter -> {
-		filter.includeGroupByRegex 'com\\.blamejared.*'
-		filter.includeGroup 'mezz.jei'
-	})
+	exclusiveRepo(handler, 'https://maven.blamejared.com', 'mezz.jei')
 
 	// Modrinth
-	maven {
-		name = 'Modrinth'
-		url = 'https://api.modrinth.com/maven'
-	}
+	exclusiveRepo(handler, 'https://api.modrinth.com/maven')
 }
 
 loom {
@@ -80,15 +74,17 @@ fabricApi {
 }
 
 dependencies {
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// Runtime Only Mods
+	modClientRuntimeOnly "appeng:appliedenergistics2-fabric:${project.ae2_version}"
+	modClientRuntimeOnly "curse.maven:inventory-hud-forge-${project.inventory_hud_id}:${project.inventory_hud_version}"
+	modClientRuntimeOnly "maven.modrinth:jade:${project.jade_version}-fabric"
 	modClientRuntimeOnly "maven.modrinth:modmenu:${project.mod_menu_version}"
 	modClientRuntimeOnly "mezz.jei:jei-${project.minecraft_version}-fabric:${project.jei_version}"
-	modClientRuntimeOnly "appeng:appliedenergistics2-fabric:${project.ae2_version}"
 }
 
 processResources {
