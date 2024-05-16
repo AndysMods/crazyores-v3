@@ -1,0 +1,45 @@
+{
+	"schemaVersion": 1,
+	"id": "crazyores",
+	"version": "${version}",
+	"name": "CrazyOres",
+	"description": "CrazyOres is an ever-expanding exploration, adventure mod that adds a variety of new ores and features to spice up your Minecraft experience.",
+	"authors": [
+		"Andy608",
+		"disco_fries"
+	],
+	"contact": {
+		"homepage": "https://andysmods.com/CrazyOres",
+		"sources": "https://github.com/AndysMods/crazyores-v3"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/crazyores/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.andysmods.crazyores.CrazyOres"
+		],
+		"client": [
+			"com.andysmods.crazyores.CrazyOresClient"
+		],
+		"fabric-datagen": [
+			"com.andysmods.crazyores.CrazyOresDataGenerator"
+		]
+	},
+	"mixins": [
+		"crazyores.mixins.json",
+		{
+			"config": "crazyores.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.15.11",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

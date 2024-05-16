@@ -1,0 +1,129 @@
+import java.util.function.Consumer
+
+plugins {
+	id 'fabric-loom' version '1.6-SNAPSHOT'
+	id 'maven-publish'
+	id 'idea'
+}
+
+idea {
+	module {
+		// Exclude the following directories from being managed.
+		for (String excludeDirName in ["run", "runGameTests", "out", "logs", "gradle"]) {
+			excludeDirs.add(new File(projectDir, excludeDirName))
+		}
+	}
+}
+
+static void exclusiveRepo(RepositoryHandler handler, String url, String... groups) {
+	exclusiveRepo(handler, url, filter -> {
+		for (def group : groups) {
+			filter.includeGroup(group)
+		}
+	})
+}
+
+static void exclusiveRepo(RepositoryHandler handler, String url, Consumer<InclusiveRepositoryContentDescriptor> filterSetup) {
+	handler.exclusiveContent {
+		it.forRepositories(handler.maven {
+			setUrl(url)
+		})
+		it.filter { f -> filterSetup.accept(f) }
+	}
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name
+}
+
+repositories { RepositoryHandler handler ->
+	mavenCentral()
+
+	// Applied Energistics 2
+	exclusiveRepo(handler, 'https://modmaven.dev/', 'appeng', 'mcjty.theoneprobe')
+
+	// Curios
+	exclusiveRepo(handler, 'https://maven.theillusivec4.top/', 'top.theillusivec4.curios')
+
+	// Curse
+	exclusiveRepo(handler, 'https://www.cursemaven.com', 'curse.maven')
+
+	// Jei
+	exclusiveRepo(handler, 'https://maven.blamejared.com', filter -> {
+		filter.includeGroupByRegex 'com\\.blamejared.*'
+		filter.includeGroup 'mezz.jei'
+	})
+
+	// Modrinth
+	maven {
+		name = 'Modrinth'
+		url = 'https://api.modrinth.com/maven'
+	}
+}
+
+loom {
+	splitEnvironmentSourceSets()
+
+	mods {
+		"mekanism-fabric" {
+			sourceSet sourceSets.main
+			sourceSet sourceSets.client
+		}
+	}
+}
+
+fabricApi {
+	configureDataGeneration()
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+	// Runtime Only Mods
+	modClientRuntimeOnly "maven.modrinth:modmenu:${project.mod_menu_version}"
+	modClientRuntimeOnly "mezz.jei:jei-${project.minecraft_version}-fabric:${project.jei_version}"
+	modClientRuntimeOnly "appeng:appliedenergistics2-fabric:${project.ae2_version}"
+}
+
+processResources {
+	inputs.property "version", project.version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": project.version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = JavaVersion.VERSION_17.majorVersion.toInteger()
+}
+
+java {
+	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
+}
+
+jar {
+	from("LICENSE") {
+		rename { "${it}_${project.base.archivesName.get()}"}
+	}
+}
+
+publishing {
+	publications {
+		create("mavenJava", MavenPublication) {
+			artifactId = project.archives_base_name
+			from components.java
+		}
+	}
+
+	repositories {
+	}
+}
