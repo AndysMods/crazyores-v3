@@ -1,5 +1,5 @@
 package com.andysmods.api;
 
-public interface IModInfo {
+public interface ModInfo {
 	String getModId();
 }

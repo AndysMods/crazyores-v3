@@ -1,6 +1,6 @@
 package com.andysmods.api;
 
 @FunctionalInterface
-public interface IRegistryInitializer {
+public interface RegistryInitializer {
 	void onInitializeRegistry();
 }

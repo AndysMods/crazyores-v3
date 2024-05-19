@@ -1,8 +1,8 @@
 package com.andysmods;
 
-import com.andysmods.api.IModInfo;
+import com.andysmods.api.ModInfo;
 
-public record CrazyOresModInfo(String modId) implements IModInfo {
+public record CrazyOresModInfo(String modId) implements ModInfo {
 	@Override
 	public String getModId() {
 		return this.modId;

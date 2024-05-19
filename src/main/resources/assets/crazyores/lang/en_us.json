@@ -1,3 +1,13 @@
 {
-  "item.crazyores.copper_bucket": "Copper Bucket"
+  "item.crazyores.copper_bucket_empty": "Copper Bucket",
+  "item.crazyores.copper_bucket_water": "Copper Water Bucket",
+  "item.crazyores.copper_bucket_lava": "Copper Lava Bucket",
+  "item.crazyores.copper_bucket_milk": "Copper Milk Bucket",
+  "item.crazyores.copper_bucket_powder_snow": "Copper Powder Snow Bucket",
+  "item.crazyores.copper_bucket_axolotl": "Copper Bucket of Axolotl",
+  "item.crazyores.copper_bucket_cod": "Copper Bucket of Cod",
+  "item.crazyores.copper_bucket_pufferfish": "Copper Bucket of Pufferfish",
+  "item.crazyores.copper_bucket_salmon": "Copper Bucket of Salmon",
+  "item.crazyores.copper_bucket_tadpole": "Copper Bucket of Tadpole",
+  "item.crazyores.copper_bucket_tropical_fish": "Copper Bucket of Tropical Fish"
 }
