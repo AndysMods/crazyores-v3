@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -26,37 +27,45 @@ public class JsonUnbakedModelMixin {
 
 	@Inject(method = "bake(Lnet/minecraft/client/render/model/Baker;Lnet/minecraft/client/render/model/json/JsonUnbakedModel;Ljava/util/function/Function;Lnet/minecraft/client/render/model/ModelBakeSettings;Lnet/minecraft/util/Identifier;Z)Lnet/minecraft/client/render/model/BakedModel;", at = @At("HEAD"), cancellable = true)
 	public void injectBake(Baker baker, JsonUnbakedModel parent, Function<SpriteIdentifier, Sprite> textureGetter, ModelBakeSettings settings, Identifier id, boolean hasDepth, CallbackInfoReturnable<BakedModel> callbackInfoReturnable) {
-
-		JsonUnbakedModel accessorThis = (JsonUnbakedModel) (Object) this;
-
-		JsonUnbakedModelAccessorMixin accessorMixin = (JsonUnbakedModelAccessorMixin) accessorThis;
-
+		final JsonUnbakedModel accessorThis = (JsonUnbakedModel) (Object) this;
+		final JsonUnbakedModelAccessorMixin accessorMixin = (JsonUnbakedModelAccessorMixin) accessorThis;
 		final Sprite sprite = textureGetter.apply(accessorThis.resolveSprite(PARTICLE_KEY));
+
 		if (accessorThis.getRootModel() == ModelLoader.BLOCK_ENTITY_MARKER) {
 			callbackInfoReturnable.setReturnValue(new BuiltinBakedModel(accessorThis.getTransformations(), accessorMixin.invokeCompileOverrides(baker, parent), sprite, accessorThis.getGuiLight().isSide()));
 			callbackInfoReturnable.cancel();
 		}
-		BasicBakedModel.Builder builder = new BasicBakedModel.Builder(accessorThis, accessorMixin.invokeCompileOverrides(baker, parent), hasDepth).setParticle(sprite);
+
+		final BasicBakedModel.Builder builder = new BasicBakedModel.Builder(accessorThis, accessorMixin.invokeCompileOverrides(baker, parent), hasDepth).setParticle(sprite);
+		final Vector3f modelCenter = calculateCenterBoundsForModel(accessorThis.getElements());
+
 		for (ModelElement modelElement : accessorThis.getElements()) {
 			for (Direction direction : modelElement.faces.keySet()) {
+
 				ModelElementFace modelElementFace = modelElement.faces.get(direction);
 				Sprite sprite2 = textureGetter.apply(accessorThis.resolveSprite(modelElementFace.textureId));
 
-				// Determine the layer and apply an offset if necessary
-				int layerIndex = getLayerIndexFromTextureId(modelElementFace.textureId);
+				// Determine the layer and apply an offset if necessary.
+				final int layerIndex = getLayerIndexFromTextureId(modelElementFace.textureId);
+				final boolean bScaleLayer = layerIndex != 0;
+				final float scaleFactor = 1.0f + (layerIndex * 0.005f);
 				ModelElement elementToBake = modelElement;
 
-				CrazyOres.CRAZYORES_LOGGER.info("modelElementFace.textureId: " + modelElementFace.textureId);
+				if (bScaleLayer) {
+					elementToBake = createOffsetElement(modelElement, modelCenter, scaleFactor);
+				}
 
-				if (layerIndex != 0) {
-					elementToBake = createOffsetElement(modelElement, layerIndex * 0.001f);
+				BakedQuad theQuad = JsonUnbakedModelAccessorMixin.createQuad(elementToBake, modelElementFace, sprite2, direction, settings, id);
+				if (bScaleLayer) {
+					theQuad = scaleQuad(theQuad, modelCenter, scaleFactor);
 				}
 
 				if (modelElementFace.cullFace == null) {
 					builder.addQuad(JsonUnbakedModelAccessorMixin.createQuad(elementToBake, modelElementFace, sprite2, direction, settings, id));
 					continue;
 				}
-				builder.addQuad(Direction.transform(settings.getRotation().getMatrix(), modelElementFace.cullFace), JsonUnbakedModelAccessorMixin.createQuad(elementToBake, modelElementFace, sprite2, direction, settings, id));
+
+				builder.addQuad(Direction.transform(settings.getRotation().getMatrix(), modelElementFace.cullFace), theQuad);
 			}
 		}
 
@@ -65,8 +74,7 @@ public class JsonUnbakedModelMixin {
 	}
 
 	private int getLayerIndexFromTextureId(String textureId) {
-		// Implement logic to determine the layer based on textureId
-		// For example, you might use naming conventions like "layer0" or "layer1"
+		// TODO: Refactor so it can handle an arbitrary amount of layers.
 
 		switch (textureId) {
 			case "layer1" -> {
@@ -84,26 +92,16 @@ public class JsonUnbakedModelMixin {
 		}
 	}
 
-	private ModelElement createOffsetElement(ModelElement element, float scale) {
+	private ModelElement createOffsetElement(ModelElement element, Vector3f modelCenter, float scale) {
 
-		// Calculate the center of the element
-//		Vector3f center = new Vector3f(
-//			(element.from.x + element.to.x) / 2,
-//			(element.from.y + element.to.y) / 2,
-//			(element.from.z + element.to.z) / 2
-//		);
+		// Scale the from and to coordinates relative to the center.
+		final Vector3f from = scaleVector(element.from, modelCenter, scale);
+		final Vector3f to = scaleVector(element.to, modelCenter, scale);
 
-		// Scale the from and to coordinates relative to the center
-//		Vector3f from = scaleVec(element.from, center, scale);
-//		Vector3f to = scaleVec(element.to, center, scale);
+		final Map<Direction, ModelElementFace> faces = element.faces;
+		final Map<Direction, ModelElementFace> offsetFaces = new HashMap<>();
 
-		final Vector3f from = new Vector3f(element.from.x + scale, element.from.y + scale, element.from.z + scale);
-		final Vector3f to = new Vector3f(element.to.x + scale, element.to.y + scale, element.to.z + scale);
-
-		Map<Direction, ModelElementFace> faces = element.faces;
-		Map<Direction, ModelElementFace> offsetFaces = new HashMap<>();
-
-		// Create new ModelElementFaces with the same data, as they are immutable
+		// Create new ModelElementFaces with the same data, as they are immutable.
 		for (Map.Entry<Direction, ModelElementFace> entry : faces.entrySet()) {
 			Direction direction = entry.getKey();
 			ModelElementFace face = entry.getValue();
@@ -113,11 +111,46 @@ public class JsonUnbakedModelMixin {
 		return new ModelElement(from, to, offsetFaces, element.rotation, element.shade);
 	}
 
-	private Vector3f scaleVec(Vector3f vec, Vector3f center, float scale) {
+	private Vector3f scaleVector(Vector3f vec, Vector3f modelCenter, float scale) {
 		return new Vector3f(
-			center.x + (vec.x - center.x) * scale,
-			center.y + (vec.y - center.y) * scale,
-			center.z + (vec.z - center.z) * scale
+			modelCenter.x + (vec.x - modelCenter.x) * scale,
+			modelCenter.y + (vec.y - modelCenter.y) * scale,
+			modelCenter.z + (vec.z - modelCenter.z) * scale
 		);
+	}
+
+	private BakedQuad scaleQuad(BakedQuad quad, Vector3f modelCenter, float scale) {
+		int[] vertexData = quad.getVertexData().clone();
+		for (int i = 0; i < vertexData.length; i += 8) {
+			float x = Float.intBitsToFloat(vertexData[i]);
+			float y = Float.intBitsToFloat(vertexData[i + 1]);
+			float z = Float.intBitsToFloat(vertexData[i + 2]);
+
+			x = modelCenter.x + (x - modelCenter.x) * scale;
+			y = modelCenter.y + (y - modelCenter.y) * scale;
+			z = modelCenter.z + (z - modelCenter.z) * scale;
+
+			vertexData[i] = Float.floatToIntBits(x);
+			vertexData[i + 1] = Float.floatToIntBits(y);
+			vertexData[i + 2] = Float.floatToIntBits(z);
+		}
+
+		return new BakedQuad(vertexData, quad.getColorIndex(), quad.getFace(), quad.getSprite(), quad.hasShade());
+	}
+
+	private Vector3f calculateCenterBoundsForModel(List<ModelElement> modelElements) {
+		float minX = Float.MAX_VALUE, minY = Float.MAX_VALUE, minZ = Float.MAX_VALUE;
+		float maxX = Float.MIN_VALUE, maxY = Float.MIN_VALUE, maxZ = Float.MIN_VALUE;
+
+		for (ModelElement modelElement : modelElements) {
+			minX = Math.min(minX, modelElement.from.x);
+			minY = Math.min(minY, modelElement.from.y);
+			minZ = Math.min(minZ, modelElement.from.z);
+			maxX = Math.max(maxX, modelElement.to.x);
+			maxY = Math.max(maxY, modelElement.to.y);
+			maxZ = Math.max(maxZ, modelElement.to.z);
+		}
+
+		return new Vector3f((minX + maxX) * 0.5f, (minY + maxY) * 0.5f, (minZ + maxZ) * 0.5f);
 	}
 }

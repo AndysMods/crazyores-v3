@@ -3,7 +3,6 @@
 	"package": "com.andysmods.crazyores.mixin.client",
 	"compatibilityLevel": "JAVA_17",
 	"client": [
-
 		"JsonUnbakedModelMixin",
 		"JsonUnbakedModelAccessorMixin"
 	],
