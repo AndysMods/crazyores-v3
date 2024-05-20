@@ -32,8 +32,7 @@ public class JsonUnbakedModelMixin {
 		final Sprite sprite = textureGetter.apply(accessorThis.resolveSprite(PARTICLE_KEY));
 
 		if (accessorThis.getRootModel() == ModelLoader.BLOCK_ENTITY_MARKER) {
-			callbackInfoReturnable.setReturnValue(new BuiltinBakedModel(accessorThis.getTransformations(), accessorMixin.invokeCompileOverrides(baker, parent), sprite, accessorThis.getGuiLight().isSide()));
-			callbackInfoReturnable.cancel();
+			return;
 		}
 
 		final BasicBakedModel.Builder builder = new BasicBakedModel.Builder(accessorThis, accessorMixin.invokeCompileOverrides(baker, parent), hasDepth).setParticle(sprite);
