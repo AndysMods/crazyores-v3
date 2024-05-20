@@ -2,11 +2,14 @@ package com.andysmods.crazyores.datagen;
 
 import com.andysmods.crazyores.CrazyOres;
 import com.andysmods.crazyores.registry.ItemRegistry;
+import com.google.gson.JsonObject;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.minecraft.data.client.*;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
+
+import java.util.Optional;
 
 public class ModelProvider extends FabricModelProvider {
 
@@ -47,6 +50,8 @@ public class ModelProvider extends FabricModelProvider {
 		generateBucketModel(itemModelGenerator, ItemRegistry.COPPER_BUCKET_SALMON, baseCopperBucketEntityTexture, salmonOverlayTexture);
 		generateBucketModel(itemModelGenerator, ItemRegistry.COPPER_BUCKET_TADPOLE, baseCopperBucketEntityTexture, tadpoleOverlayTexture);
 		generateBucketModel(itemModelGenerator, ItemRegistry.COPPER_BUCKET_TROPICAL_FISH, baseCopperBucketEntityTexture, tropicalFishOverlayTexture);
+
+//		new Model(Optional.of(new Identifier("crazyores", "builtin/entity")), Optional.of(variant), requiredTextureKeys)
 	}
 
 	private void generateItemModel(ItemModelGenerator itemModelGenerator, Item item, Identifier textureLocation) {
