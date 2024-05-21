@@ -1,7 +1,8 @@
-package com.andysmods.crazyores.registry;
+package com.andysmods.crazyores.registry.behavior;
 
 import com.andysmods.api.RegistryInitializer;
 import com.andysmods.api.bucket.Bucket;
+import com.andysmods.crazyores.registry.ItemRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;

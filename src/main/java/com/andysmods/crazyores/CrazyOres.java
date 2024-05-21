@@ -1,8 +1,9 @@
 package com.andysmods.crazyores;
 
 import com.andysmods.CrazyOresModInfo;
-import com.andysmods.crazyores.registry.CauldronBehaviorRegistry;
+import com.andysmods.crazyores.registry.behavior.CauldronBehaviorRegistry;
 import com.andysmods.crazyores.registry.ItemRegistry;
+import com.andysmods.crazyores.registry.behavior.DispenserBehaviourRegistry;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ public class CrazyOres implements ModInitializer {
 
 	private static final ItemRegistry itemRegistry = new ItemRegistry();
 	private static final CauldronBehaviorRegistry cauldronBehaviorRegistry = new CauldronBehaviorRegistry();
+	private static final DispenserBehaviourRegistry dispenserBehaviorRegistry = new DispenserBehaviourRegistry();
 
 	@Override
 	public void onInitialize() {
@@ -21,5 +23,6 @@ public class CrazyOres implements ModInitializer {
 
 		itemRegistry.onInitializeRegistry();
 		cauldronBehaviorRegistry.onInitializeRegistry();
+		dispenserBehaviorRegistry.onInitializeRegistry();
 	}
 }

@@ -38,7 +38,7 @@ public abstract class CustomBucketItem extends BucketItem implements Bucket {
 
 	@Override
 	public ItemStack getEmptyBucket(ItemStack filledBucket, PlayerEntity player) {
-		if (player.getAbilities().creativeMode) {
+		if (player != null && player.getAbilities().creativeMode) {
 			return filledBucket;
 		}
 
