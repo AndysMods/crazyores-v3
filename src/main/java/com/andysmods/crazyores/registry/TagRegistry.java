@@ -7,7 +7,7 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 
-public class TagRegistry {
+public final class TagRegistry {
 
 	private static final String COMMON_ID = "c";
 

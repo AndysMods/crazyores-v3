@@ -23,7 +23,7 @@ import net.minecraft.util.Identifier;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ItemRegistry implements RegistryInitializer {
+public final class ItemRegistry implements RegistryInitializer {
 
 	public static Map<EntityType<?>, Item> COPPER_ENTITY_BUCKETS = new HashMap<>();
 
