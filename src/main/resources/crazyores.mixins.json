@@ -3,7 +3,6 @@
 	"package": "com.andysmods.crazyores.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"ExampleMixin",
 		"accessor.FluidBlockAccessorMixin",
 		"entity.AxolotlEntityMixin",
 		"entity.BucketableEntityMixin",
