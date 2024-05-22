@@ -38,7 +38,7 @@ public final class CauldronBehaviorRegistry implements RegistryInitializer {
 		fillCauldron(world, pos, player, hand, stack, Blocks.POWDER_SNOW_CAULDRON.getDefaultState().with(LeveledCauldronBlock.LEVEL, 3), SoundEvents.ITEM_BUCKET_EMPTY_POWDER_SNOW);
 
 	@Override
-	public void onInitializeRegistry() {
+	public void initializeRegistry() {
 		registerCauldronBehaviorsForCopperBuckets();
 	}
 

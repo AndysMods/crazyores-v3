@@ -44,7 +44,7 @@ public final class DispenserBehaviourRegistry implements RegistryInitializer {
 	};
 
 	@Override
-	public void onInitializeRegistry() {
+	public void initializeRegistry() {
 		registerDispenserBehaviorsForCopperBuckets();
 	}
 

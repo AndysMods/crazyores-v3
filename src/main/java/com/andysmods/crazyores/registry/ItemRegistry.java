@@ -1,7 +1,6 @@
 package com.andysmods.crazyores.registry;
 
 import com.andysmods.api.RegistryInitializer;
-import com.andysmods.api.bucket.Bucket;
 import com.andysmods.api.bucket.CustomEntityBucketItem;
 import com.andysmods.api.bucket.CustomMilkBucketItem;
 import com.andysmods.api.bucket.CustomPowderSnowBucketItem;
@@ -58,7 +57,7 @@ public final class ItemRegistry implements RegistryInitializer {
 	}
 
 	@Override
-	public void onInitializeRegistry() {
+	public void initializeRegistry() {
 		CrazyOres.CRAZYORES_LOGGER.info("Registering items!");
 
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(ItemRegistry::itemGroupIngredients);
